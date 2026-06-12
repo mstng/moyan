@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moyan - もやもやを吐き出そう</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo">😶‍🌫️ Moyan</h1>
+      <p class="tagline">匿名でもやもやを吐き出そう</p>
+      <button class="btn-post" id="openModal">投稿する</button>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="main">
+
+    <!-- フィルターバー -->
+    <div class="filter-bar">
+      <div class="sort-buttons">
+        <button class="sort-btn active" data-sort="new">新着順</button>
+        <button class="sort-btn" data-sort="sympathy">共感順</button>
+      </div>
+      <div class="category-buttons">
+        <button class="cat-btn active" data-cat="">すべて</button>
+        <button class="cat-btn" data-cat="仕事">仕事</button>
+        <button class="cat-btn" data-cat="人間関係">人間関係</button>
+        <button class="cat-btn" data-cat="家族">家族</button>
+        <button class="cat-btn" data-cat="恋愛">恋愛</button>
+        <button class="cat-btn" data-cat="お金">お金</button>
+        <button class="cat-btn" data-cat="その他">その他</button>
+      </div>
+    </div>
+
+    <!-- 投稿一覧 -->
+    <div class="posts" id="posts">
+      <p class="loading">読み込み中…</p>
+    </div>
+
+  </main>
+
+  <!-- 投稿モーダル -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2 class="modal-title">もやもやを投稿する</h2>
+      <div class="form-group">
+        <label for="category">カテゴリ</label>
+        <select id="category">
+          <option value="">選択してください</option>
+          <option value="仕事">仕事</option>
+          <option value="人間関係">人間関係</option>
+          <option value="家族">家族</option>
+          <option value="恋愛">恋愛</option>
+          <option value="お金">お金</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="postText">もやもやを書いてね</label>
+        <textarea id="postText" placeholder="誰にも言えないもやもや、ここで吐き出してください…" maxlength="300"></textarea>
+        <p class="char-count"><span id="charCount">0</span> / 300</p>
+      </div>
+      <p class="error-msg" id="errorMsg"></p>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="closeModal">キャンセル</button>
+        <button class="btn-submit" id="submitPost">投稿する</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
