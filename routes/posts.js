@@ -82,4 +82,42 @@ router.post('/:id/report', async (req, res) => {
   res.json({ success: true });
 });
 
+// GET /api/posts/:id/comments - コメント一覧取得
+router.get('/:id/comments', async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from('comments')
+    .select('*')
+    .eq('post_id', id)
+    .order('created_at', { ascending: true });
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  res.json(data);
+});
+
+// POST /api/posts/:id/comments - コメント投稿
+router.post('/:id/comments', async (req, res) => {
+  const { id } = req.params;
+  const { text } = req.body;
+
+  if (!text || text.trim().length === 0) {
+    return res.status(400).json({ error: 'コメントを入力してください' });
+  }
+  if (text.length > 200) {
+    return res.status(400).json({ error: 'コメントは200文字以内で入力してください' });
+  }
+
+  const { data, error } = await supabase
+    .from('comments')
+    .insert({ post_id: id, text: text.trim() })
+    .select()
+    .single();
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  res.status(201).json(data);
+});
+
 module.exports = router;

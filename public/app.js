@@ -59,7 +59,17 @@ function renderPostCard(post) {
         <button class="action-btn" onclick="handleReport('${post.id}', this)">
           🚩 報告
         </button>
+        <button class="action-btn" onclick="toggleComments('${post.id}', this)">
+          💬 コメント
+        </button>
         <span class="post-date">${date}</span>
+      </div>
+      <div class="comments-section" id="comments-${post.id}" style="display:none;">
+        <div class="comments-list" id="comments-list-${post.id}"></div>
+        <div class="comment-form">
+          <textarea class="comment-input" id="comment-input-${post.id}" placeholder="コメントを入力…" maxlength="200"></textarea>
+          <button class="btn-comment-submit" onclick="handleCommentSubmit('${post.id}')">送信</button>
+        </div>
       </div>
     </div>
   `;
@@ -193,6 +203,69 @@ function saveSympathized(postId) {
   if (!list.includes(postId)) {
     list.push(postId);
     localStorage.setItem('sympathized', JSON.stringify(list));
+  }
+}
+
+// --- コメントの表示・非表示を切り替える ---
+async function toggleComments(postId, btn) {
+  const section = document.getElementById(`comments-${postId}`);
+  const isOpen = section.style.display !== 'none';
+
+  if (isOpen) {
+    section.style.display = 'none';
+    btn.textContent = '💬 コメント';
+    return;
+  }
+
+  section.style.display = 'block';
+  btn.textContent = '💬 閉じる';
+  await fetchComments(postId);
+}
+
+// --- コメント一覧を取得して表示する ---
+async function fetchComments(postId) {
+  const listEl = document.getElementById(`comments-list-${postId}`);
+  listEl.innerHTML = '<p class="loading">読み込み中…</p>';
+
+  try {
+    const res = await fetch(`${API_BASE}/posts/${postId}/comments`);
+    const comments = await res.json();
+
+    if (comments.length === 0) {
+      listEl.innerHTML = '<p class="empty-comment">まだコメントがありません</p>';
+      return;
+    }
+
+    listEl.innerHTML = comments.map(c => `
+      <div class="comment">
+        <p class="comment-text">${escapeHtml(c.text)}</p>
+        <span class="comment-date">${new Date(c.created_at).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+      </div>
+    `).join('');
+  } catch {
+    listEl.innerHTML = '<p class="empty-comment">読み込みに失敗しました</p>';
+  }
+}
+
+// --- コメントを投稿する ---
+async function handleCommentSubmit(postId) {
+  const input = document.getElementById(`comment-input-${postId}`);
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/posts/${postId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    if (!res.ok) throw new Error();
+
+    input.value = '';
+    await fetchComments(postId);
+  } catch {
+    alert('コメントの送信に失敗しました');
   }
 }
 
